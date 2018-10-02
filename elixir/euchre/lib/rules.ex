@@ -11,7 +11,7 @@ defmodule Euchre.Rules do
   end
 
   defp burn(deck) do
-    deck |> Enum.slice(3, 28)
+    deck |> Enum.slice(4, 28)
   end
 
   defp turn(deck) do
