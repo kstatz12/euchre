@@ -7,7 +7,7 @@ defmodule Euchre.Game do
   alias Euchre.Player
 
   ## Server Setup
-  def init(%Gastate) do
+  def init(%GameState{} = state) do
     {:ok, state}
   end
 
@@ -19,7 +19,7 @@ defmodule Euchre.Game do
 
   ## Client
   def add_player(pid, player) do
-    GenServer.cast(pid, {:add_player, player_name})
+    GenServer.cast(pid, {:add_player, player})
   end
 
   def start_game(pid) do
@@ -34,21 +34,4 @@ defmodule Euchre.Game do
     %{state | players: p ++ [{player_name, pid}]}
     {:noreply, state}
   end
-
-  ## Logic
-  # TODO move this to its own module
-  defp start_game(deck)
-    when is_list(deck)
-  do
-    deck
-    |> Enum.shuffle
-    |> Enum.slice(4, 28)
-    |> turn
-  end
-
-  defp turn(deck) do
-    suit = Enum.take(deck, 1)
-    {suit, deck}
-  end
-
 end

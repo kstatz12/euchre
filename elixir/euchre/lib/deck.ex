@@ -30,4 +30,27 @@ defmodule Euchre.Deck do
       %Card{suit: :clubs, rank: 'J'},
       %Card{suit: :diamonds, rank: 'J'}]
   end
+
+  def init(deck)
+    when is_list(deck)
+  do
+    deck
+    |> Enum.shuffle
+    |> Enum.slice(3, 28)
+    |> turn
+  end
+
+  def get_top_card(deck)
+    when is_list(deck)
+  do
+    [head| tail] = deck
+    %{head: head, deck: tail}
+  end
+
+  defp turn(deck) do
+      suit = Enum.take(deck, 1)
+      {suit, deck}
+  end
+
+
 end
