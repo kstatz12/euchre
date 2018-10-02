@@ -5,7 +5,7 @@ defmodule Euchre.Rules do
     when is_list(deck)
   do
     deck
-    |> Enum.shuffl
+    |> Enum.shuffle
     |> burn
     |> turn
   end
