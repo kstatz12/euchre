@@ -51,6 +51,4 @@ defmodule Euchre.Deck do
       suit = Enum.take(deck, 1)
       {suit, deck}
   end
-
-
 end

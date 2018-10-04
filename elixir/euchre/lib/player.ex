@@ -1,19 +1,16 @@
 defmodule Euchre.Player do
   use GenServer
-  
-  alias Euchre.PlayerState
 
-  def init(%PlayerState{} = initial_state) do
-    {:ok, initial_state}
+  def init(hand) do
+    {:ok, hand}
   end
 
   def start_link(name) do
-    GenServer.start_link(__MODULE__, %PlayerState{}, name: name)
+    GenServer.start_link(__MODULE__, [])
   end
 
-
-  def join_game(server, game_pid) do
-    
+  def deal_card(pid, card) do
+    GenServer.cast(pid, {:deal_card, card})
   end
+
 end
-                             
