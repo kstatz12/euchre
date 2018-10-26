@@ -51,5 +51,3 @@ get_deck() ->
 shuffle(Deck) when is_list(Deck)->
     [X||{_,X} <- lists:sort([{rand:uniform(), N} || N <- Deck])].
 
-remove(List, Elem) ->    
-    lists:filter(fun(E)-> not lists:member(E, Elem) end, List).
