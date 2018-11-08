@@ -1,6 +1,7 @@
 -module(game).
 
 -export([start/0, deal_one/1, deal_two/1]).
+-export([rank/2]).
 
 -record(card, {suit, rank}).
 
@@ -18,36 +19,71 @@ deal_two(Deck) ->
 
 get_deck() ->
     [
-     #card{suit = "Hearts", rank = "A"},
-     #card{suit = "Spades", rank = "A"},
-     #card{suit = "Diamonds", rank = "A"},
-     #card{suit = "Clubs", rank = "A"},
-     #card{suit = "Hearts", rank = "K"},
-     #card{suit = "Spades", rank = "K"},
-     #card{suit = "Diamonds", rank = "K"},
-     #card{suit = "Clubs", rank = "K"},
-     #card{suit = "Hearts", rank = "Q"},
-     #card{suit = "Spades", rank = "Q"},
-     #card{suit = "Diamonds", rank = "Q"},
-     #card{suit = "Clubs", rank = "Q"},
-     #card{suit = "Hearts", rank = "J"},
-     #card{suit = "Spades", rank = "J"},
-     #card{suit = "Diamonds", rank = "J"},
-     #card{suit = "Clubs", rank = "J"},
-     #card{suit = "Hearts", rank = "10"},
-     #card{suit = "Spades", rank = "10"},
-     #card{suit = "Diamonds", rank = "10"},
-     #card{suit = "Clubs", rank = "10"},
-     #card{suit = "Hearts", rank = "9"},
-     #card{suit = "Spades", rank = "9"},
-     #card{suit = "Diamonds", rank = "9"},
-     #card{suit = "Clubs", rank = "9"},
-     #card{suit = "Hearts", rank = "8"},
-     #card{suit = "Spades", rank = "8"},
-     #card{suit = "Diamonds", rank = "8"},
-     #card{suit = "Clubs", rank = "8"}
+     #card{suit = hearts, rank = 14},
+     #card{suit = spades, rank = 14},
+     #card{suit = diamonds, rank = 14},
+     #card{suit = clubs, rank = 14},
+     #card{suit = hearts, rank = 13},
+     #card{suit = spades, rank = 13},
+     #card{suit = diamonds, rank = 13},
+     #card{suit = clubs, rank = 13},
+     #card{suit = hearts, rank = 12},
+     #card{suit = spades, rank = 12},
+     #card{suit = diamonds, rank = 12},
+     #card{suit = clubs, rank = 12},
+     #card{suit = hearts, rank = 12},
+     #card{suit = spades, rank = 11},
+     #card{suit = diamonds, rank = 11},
+     #card{suit = clubs, rank = 11},
+     #card{suit = hearts, rank = 10},
+     #card{suit = spades, rank = 10},
+     #card{suit = diamonds, rank = 10},
+     #card{suit = clubs, rank = 9},
+     #card{suit = hearts, rank = 9},
+     #card{suit = spades, rank = 9},
+     #card{suit = diamonds, rank = 9},
+     #card{suit = clubs, rank = 9},
+     #card{suit = hearts, rank = 8},
+     #card{suit = spades, rank = 8},
+     #card{suit = diamonds, rank = 8},
+     #card{suit = clubs, rank = 8}
     ].
 
 shuffle(Deck) when is_list(Deck)->
     [X||{_,X} <- lists:sort([{rand:uniform(), N} || N <- Deck])].
+
+
+rank(Hand, Trump) when is_list(Hand), is_atom(Trump) ->
+    Bowers = get_bowers(Hand, Trump),
+    Trumps = get_trump_in_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Hand, Trump),
+    NonTrumps = get_non_trump_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Hand, Trump),
+    lists:append(Bowers, Trumps, NonTrumps);
+rank([], _) ->
+    {error, "Hand Empty"};
+rank(_, _) ->
+    {error, "Invalid Input"}.
+
+
+
+get_bowers(Hand, Trump) ->
+    [TJ || TJ <- Hand, TJ#card.suit =:= Trump, TJ#card.suit =:= reciprocating_trump(Trump), TJ#card.rank =:= 11].
+
+get_trump_in_ordered(Pred, Hand, Trump) when is_function(Pred) ->
+    [T || T <- lists:sort(Pred, [UT|| UT <- Hand, UT#card.suit =:= Trump, UT#card.rank =/= 11])].
+
+get_non_trump_ordered(Hand, Trump, Pred) when is_function(Pred) ->
+    [NT || NT <- lists:sort(Pred, [UNT || UNT <- Hand, UNT#card.suit =/= Trump])].  
+
+reciprocating_trump(hearts) ->
+    diamonds;
+reciprocating_trump(diamonds) ->
+    hearts;
+reciprocating_trump(spades) ->
+    clubs;
+reciprocating_trump(clubs) ->
+    spades.
+
+
+
+
 
