@@ -55,21 +55,19 @@ shuffle(Deck) when is_list(Deck)->
 
 rank(Hand, Trump) when is_list(Hand), is_atom(Trump) ->
     Bowers = get_bowers(Hand, Trump),
-    Trumps = get_trump_in_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Hand, Trump),
+    Trumps = get_trump_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Hand, Trump),
     NonTrumps = get_non_trump_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Hand, Trump),
     lists:append(Bowers, Trumps, NonTrumps);
 rank([], _) ->
-    {error, "Hand Empty"};
-rank(_, _) ->
-    {error, "Invalid Input"}.
-
-
+    {error, "Hand Empty"}.
 
 get_bowers(Hand, Trump) ->
-    [TJ || TJ <- Hand, TJ#card.suit =:= Trump, TJ#card.suit =:= reciprocating_trump(Trump), TJ#card.rank =:= 11].
+    Left = [L || L <- Hand, L#card.suit =:= Trump, L#card.rank =:= 11],
+    Right = [R || R <- Hand, R#card.suit =:= reciprocating_trump(Trump), R#card.rank =:= 11],
+    lists:append(Left, Right).
 
-get_trump_in_ordered(Pred, Hand, Trump) when is_function(Pred) ->
-    [T || T <- lists:sort(Pred, [UT|| UT <- Hand, UT#card.suit =:= Trump, UT#card.rank =/= 11])].
+get_trump_ordered(Pred, Hand, Trump) when is_function(Pred) ->
+    [T || T <- lists:sort(Pred, [UT || UT <- Hand, UT#card.suit =:= Trump, UT#card.rank =/= 11])].
 
 get_non_trump_ordered(Hand, Trump, Pred) when is_function(Pred) ->
     [NT || NT <- lists:sort(Pred, [UNT || UNT <- Hand, UNT#card.suit =/= Trump])].  
