@@ -53,7 +53,9 @@ get_top_card(Cards, Trump) ->
     {H, T}.
 
 rank(Cards, Trump) when is_list(Cards), is_atom(Trump) ->
-    Bowers = get_bowers(Cards, Trump),
+    [R || R <- Cards, R#card.suit =:= Trump, R#card.rank =:= 11] ++
+    [L || L <- Cards, R#card.suit =:= reciprocating_trump(Trump), L#card.rank =:= 11] ++
+
     Trumps = get_trump_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Cards, Trump),
     NonTrumps = get_non_trump_ordered(fun(L, R) -> L#card.rank > R#card.rank end, Cards, Trump),
     Bowers ++ Trumps ++ NonTrumps;
@@ -66,10 +68,10 @@ get_bowers(Cards, Trump) ->
     lists:append(Right, Left).
 
 get_trump_ordered(Pred, Cards, Trump) when is_function(Pred) ->
-    [T || T <- lists:sort(Pred, [UT || UT <- Cards, UT#card.suit =:= Trump, UT#card.rank =/= 11])].
+    [T || T <- lists:sort(card_order_predicate, [UT || UT <- Cards, UT#card.suit =:= Trump, UT#card.rank =/= 11])].
 
 get_non_trump_ordered(Pred, Cards, Trump) when is_function(Pred) ->
-    [NT || NT <- lists:sort(Pred, [UNT || UNT <- Cards, UNT#card.suit =/= Trump, UNT#card.rank =/= 11])].
+    [NT || NT <- lists:sort(card_order_predicate, [UNT || UNT <- Cards, UNT#card.suit =/= Trump, UNT#card.rank =/= 11])].
 
 reciprocating_trump(hearts) ->
     diamonds;
@@ -79,6 +81,9 @@ reciprocating_trump(spades) ->
     clubs;
 reciprocating_trump(clubs) ->
     spades.
+
+card_order_predicate(L, R) ->
+    L#card.rank > R#card.rank.
 
 
 
