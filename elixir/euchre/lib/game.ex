@@ -1,25 +1,24 @@
 defmodule Euchre.Game do
-  use GenServer
-
 
   alias Euchre.Deck
-  alias Euchre.GameState
-  alias Euchre.Player
+  def get_deck() do
+    Deck.init()
+  end
 
-  ## Server Setup
-  def init(%GameState{} = state) do
-    {:ok, state}
+  def deal_one(deck) do
+    [H | T] = deck
+    %{card: H, deck: T}
+  end
+
+  def deal_two(deck) do
+    [A, B | T] = deck
+    %{card_a: A, card_b: B, deck: T}
   end
 
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, Deck.gen)
-  end
-
-
-  ## Client
-  def start_game(pid) do
-    GenServer.cast(pid, :start_game)
+  def rank(cards, trump) do
+    RBower = for R <- cards, do card.suit = trump, card.rank = 11 end
+    LBower = for L <- cards, do card.suit != trump, card.rank = 11 end
   end
 
 end

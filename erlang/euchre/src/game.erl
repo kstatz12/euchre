@@ -48,19 +48,19 @@ get_deck() ->
 shuffle(Deck) when is_list(Deck)->
     [X || {_,X} <- lists:sort([{rand:uniform(), N} || N <- Deck])].
 
-get_top_card(Cards, Trump) ->
+get_top_card(Cards, Trump) when is_list(Cards), is_atom(Trump) ->
     [H | T] = rank(Cards, Trump),
-    {H, T}.
+    {H, T};
+get_top_card([], _) ->
+    {error, "No Cards"}.
 
-rank(Cards, Trump) when is_list(Cards), is_atom(Trump) ->
+rank(Cards, Trump) ->
     Predicate = fun(L, R) -> L#card.rank > R#card.rank end,
     RBower = [R || R <- Cards, R#card.suit =:= Trump, R#card.rank =:= 11],
     LBower = [L || L <- Cards, L#card.suit =:= reciprocating_trump(Trump), L#card.rank =:= 11],
-    Trump = [T || T <- lists:sort(Predicate, [UT || UT <- Cards, UT#card.suit =:= Trump, UT#card.rank =/= 11])],
-    NTrump = [NT || NT <- lists:sort(Predicate, [UNT || UNT <- Cards, UNT#card.suit =/= Trump, UNT#card.rank =/= 11])],
-    RBower ++ LBower ++ Trump ++ NTrump;
-rank([], _) ->
-    {error, "Cards Empty"}.
+    SortedTrump = [T || T <- lists:sort(Predicate, [UT || UT <- Cards, UT#card.suit =:= Trump, UT#card.rank =/= 11])],
+    NTrump = [NT || NT <- lists:sort(Predicate, [UNT || UNT <- Cards, UNT#card.suit =/= Trump])],
+    RBower ++ LBower ++ SortedTrump ++ NTrump.
 
 reciprocating_trump(hearts) ->
     diamonds;
@@ -70,3 +70,4 @@ reciprocating_trump(spades) ->
     clubs;
 reciprocating_trump(clubs) ->
     spades.
+
