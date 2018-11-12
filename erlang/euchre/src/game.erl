@@ -1,9 +1,10 @@
 -module(game).
 
 -export([start/0, deal_one/1, deal_two/1]).
--export([get_top_card/2]).
+-export([get_top_card/2, play_card/4]).
 
 -record(card, {suit, rank}).
+-record(played_card, {suit, rank, team}).
 
 start() ->
     Deck = get_deck(),
@@ -58,9 +59,40 @@ rank(Cards, Trump) ->
     Predicate = fun(L, R) -> L#card.rank > R#card.rank end,
     RBower = [R || R <- Cards, R#card.suit =:= Trump, R#card.rank =:= 11],
     LBower = [L || L <- Cards, L#card.suit =:= reciprocating_trump(Trump), L#card.rank =:= 11],
-    SortedTrump = [T || T <- lists:sort(Predicate, [UT || UT <- Cards, UT#card.suit =:= Trump, UT#card.rank =/= 11])],
-    NTrump = [NT || NT <- lists:sort(Predicate, [UNT || UNT <- Cards, UNT#card.suit =/= Trump])],
+    SortedTrump = [T || 
+        T <- lists:sort(Predicate, [UT || 
+            UT <- Cards, UT#card.suit =:= Trump, UT#card.rank =/= 11])],
+    NTrump = [NT || 
+        NT <- lists:sort(Predicate, [UNT || 
+            UNT <- Cards, UNT#card.suit =/= Trump])],
     RBower ++ LBower ++ SortedTrump ++ NTrump.
+
+play_card(Hand, Pot, Trump, Team) ->
+    case Pot of
+        [] ->
+            [H | T] = rank(Hand, Trump),
+            NewPot = Pot ++ #played_card{team = Team, rank = H#card.rank, suit = H#card.suit},
+            {NewPot, T};
+        _ ->
+            ok
+    end.
+
+traverse_pot(Pot, Hand, Team, Trump) ->
+    [H | T] = rank(Pot, Trump),
+    if
+        H#played_card.team =:= Team ->
+            ok;
+        true ->
+            ok
+    end;
+
+traverse_pot([], _Hand, _Team, _Trump) ->
+    ok.
+
+
+play_card_from_hand(Hand, Target, Trump, Team) ->
+    ok.
+
 
 reciprocating_trump(hearts) ->
     diamonds;
@@ -70,4 +102,5 @@ reciprocating_trump(spades) ->
     clubs;
 reciprocating_trump(clubs) ->
     spades.
+
 

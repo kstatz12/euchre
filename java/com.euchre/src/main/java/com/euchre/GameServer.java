@@ -11,7 +11,6 @@ public class GameServer extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(StartGameMessage.class, sg ->{
-            this.deck.init().shuffle();
         }).build();
     }
 }
