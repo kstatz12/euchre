@@ -1,10 +1,10 @@
 -module(game).
 
 -export([start/0, deal_one/1, deal_two/1]).
--export([get_top_card/2, play_card/4]).
+-export([play_card/4]).
 
--record(card, {suit, rank}).
--record(played_card, {suit, rank, team}).
+-include("contracts.hrl").
+
 
 start() ->
     Deck = get_deck(),
@@ -70,28 +70,11 @@ rank(Cards, Trump) ->
 play_card(Hand, Pot, Trump, Team) ->
     case Pot of
         [] ->
-            [H | T] = rank(Hand, Trump),
-            NewPot = Pot ++ #played_card{team = Team, rank = H#card.rank, suit = H#card.suit},
-            {NewPot, T};
+            {T, R} = get_top_card(Hand, Trump),
+            ok;
         _ ->
             ok
     end.
-
-traverse_pot(Pot, Hand, Team, Trump) ->
-    [H | T] = rank(Pot, Trump),
-    if
-        H#played_card.team =:= Team ->
-            ok;
-        true ->
-            ok
-    end;
-
-traverse_pot([], _Hand, _Team, _Trump) ->
-    ok.
-
-
-play_card_from_hand(Hand, Target, Trump, Team) ->
-    ok.
 
 
 reciprocating_trump(hearts) ->

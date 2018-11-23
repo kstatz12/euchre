@@ -1,0 +1,4 @@
+-record(player, {hand, team, is_dealer}).
+-record(card, {suit, rank}).
+-record(played_card, {suit, rank, team}).
+-record(game_state, {players, state, pot, deck}).
